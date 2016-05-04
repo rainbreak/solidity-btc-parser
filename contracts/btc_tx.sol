@@ -44,3 +44,21 @@
 // <=0xFFFF (65535)| 3                     | 0xFD followed by length as uint16
 // <=0xFFFF FFFF   | 5                     | 0xFE followed by length as uint32
 // -               | 9                     | 0xFF followed by length as uint64
+
+library BTC {
+    // Convert a variable integer into something useful.
+    // Currently limited to values < 0xFD (253), i.e. TRANSACTIONS
+    // MUST HAVE LESS THAN 253 INPUTS.
+    // TODO: Logic for higher values
+    function parseVarInt(bytes txBytes) returns uint {
+        // the first byte is special
+        // remember bytes is like uint8[]
+        ibit = uint8(txBytes[0]);
+        if (ibit < 253) {
+            return ibit;
+        } else {
+            throw;
+        }
+    }
+
+}
