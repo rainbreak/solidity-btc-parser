@@ -45,20 +45,68 @@
 // <=0xFFFF FFFF   | 5                     | 0xFE followed by length as uint32
 // -               | 9                     | 0xFF followed by length as uint64
 
+// parse a raw bitcoin transaction byte array
 library BTC {
-    // Convert a variable integer into something useful.
-    // Currently limited to values < 0xFD (253), i.e. TRANSACTIONS
-    // MUST HAVE LESS THAN 253 INPUTS.
-    // TODO: Logic for higher values
-    function parseVarInt(bytes txBytes) returns uint {
-        // the first byte is special
-        // remember bytes is like uint8[]
-        ibit = uint8(txBytes[0]);
-        if (ibit < 253) {
-            return ibit;
-        } else {
-            throw;
+    // Convert a variable integer into something useful and return it and
+    // the index to after it.
+    function parseVarInt(bytes txBytes, uint pos) returns (uint, uint) {
+        // the first byte tells us how big the integer is
+        var ibit = uint8(txBytes[pos]);
+        pos += 1;  // skip ibit
+
+        if (ibit < 0xfd) {
+            return (ibit, pos);
+        } else if (ibit == 0xfd) {
+            return (getBytesLE(txBytes, pos, 16), pos + 3);
+        } else if (ibit == 0xfe) {
+            return (getBytesLE(txBytes, pos, 32), pos + 5);
+        } else if (ibit == 0xff) {
+            return (getBytesLE(txBytes, pos, 64), pos + 9);
         }
+    }
+    // convert little endian bytes to uint
+    function getBytesLE(bytes data, uint pos, uint bits) returns (uint) {
+        if (bits == 16) {
+            return uint(data[pos])
+                 + uint(data[pos + 1]) * 2**8;
+        } else if (bits == 32) {
+            return uint(data[pos])
+                 + uint(data[pos + 1]) * 2 ** 8
+                 + uint(data[pos + 2]) * 2 ** 16
+                 + uint(data[pos + 3]) * 2 ** 24;
+        } else if (bits == 64) {
+            return uint(data[pos])
+                 + uint(data[pos + 1]) * 2 ** 8
+                 + uint(data[pos + 2]) * 2 ** 16
+                 + uint(data[pos + 3]) * 2 ** 24
+                 + uint(data[pos + 4]) * 2 ** 32
+                 + uint(data[pos + 5]) * 2 ** 40
+                 + uint(data[pos + 6]) * 2 ** 48
+                 + uint(data[pos + 6]) * 2 ** 56;
+        }
+    }
+    function getFirstTwoOutputs(bytes txBytes) {
+        uint pos;
+        uint n_inputs;
+        uint n_outputs;
+        uint script_len;
+
+        pos = 4;  // skip version
+
+        (n_inputs, pos) = parseVarInt(txBytes, pos);
+
+        for (var i = 0; i < n_inputs; i++) {
+            pos += 36;  // skip outpoint
+            (script_len, pos) = parseVarInt(txBytes, pos);
+            pos += script_len + 4;  // skip sig_script, seq
+        }
+
+        (n_outputs, pos) = parseVarInt(txBytes, pos);
+
+        if (n_outputs < 2) {
+            return;
+        }
+
     }
 
 }
