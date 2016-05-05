@@ -85,7 +85,9 @@ library BTC {
                  + uint(data[pos + 6]) * 2 ** 56;
         }
     }
-    function getFirstTwoOutputs(bytes txBytes) {
+    function getFirstTwoOutputs(bytes txBytes) returns (uint, uint, uint,
+                                                        uint, uint, uint)
+    {
         uint pos;
         uint n_inputs;
         uint n_outputs;
@@ -106,7 +108,25 @@ library BTC {
         if (n_outputs < 2) {
             return;
         }
+        // first ouput
+        var out_value_1 = getBytesLE(txBytes, pos, 64);
+        pos += 8;
 
+        (script_len, pos) = parseVarInt(txBytes, pos);
+        var script_start_1 = pos;
+        var script_end_1 = pos + script_len;
+        pos += script_len;
+
+        // second output
+        var out_value_2 = getBytesLE(txBytes, pos, 64);
+        pos += 8;
+
+        (script_len, pos) = parseVarInt(txBytes, pos);
+        var script_start_2 = pos;
+        var script_end_2 = pos + script_len;
+        pos += script_len;
+
+        return (out_value_1, script_start_1, script_end_1,
+                out_value_2, script_start_2, script_end_2);
     }
-
 }
