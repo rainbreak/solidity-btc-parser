@@ -6,9 +6,9 @@
 //
 // field     | size | type     | description
 // version   | 4    | int32    | transaction version number
-// n_tx_in   | 1+   | var_int  | number of transaction inputs
+// n_tx_in   | 1-9  | var_int  | number of transaction inputs
 // tx_in     | 41+  | tx_in[]  | list of transaction inputs
-// n_tx_out  | 1+   | var_int  | number of transaction outputs
+// n_tx_out  | 1-9  | var_int  | number of transaction outputs
 // tx_out    | 9+   | tx_out[] | list of transaction outputs
 // lock_time | 4    | uint32   | block number / timestamp at which tx locked
 //
@@ -16,7 +16,7 @@
 //
 // field      | size | type     | description
 // previous   | 36   | outpoint | Previous output transaction reference
-// script_len | 1+   | var_int  | Length of the signature script
+// script_len | 1-9  | var_int  | Length of the signature script
 // sig_script | ?    | uchar[]  | Script for confirming transaction authorization
 // sequence   | 4    | uint32   | Sender transaction version
 //
@@ -30,7 +30,7 @@
 //
 // field         | size | type     | description
 // value         | 8    | int64    | Transaction value (Satoshis)
-// pk_script_len | 1+   | var_int  | Length of the public key script
+// pk_script_len | 1-9  | var_int  | Length of the public key script
 // pk_script     | ?    | uchar[]  | Public key as a Bitcoin script.
 //
 // Variable integers (var_int) can be encoded differently depending
@@ -39,11 +39,11 @@
 //
 // Variable integer encodings as a function of represented value:
 //
-// value           | storage length (hex)  | format
-// <0xFD (253)     | 1                     | uint8
-// <=0xFFFF (65535)| 3                     | 0xFD followed by length as uint16
-// <=0xFFFF FFFF   | 5                     | 0xFE followed by length as uint32
-// -               | 9                     | 0xFF followed by length as uint64
+// value           | bytes  | format
+// <0xFD (253)     | 1      | uint8
+// <=0xFFFF (65535)| 3      | 0xFD followed by length as uint16
+// <=0xFFFF FFFF   | 5      | 0xFE followed by length as uint32
+// -               | 9      | 0xFF followed by length as uint64
 
 // parse a raw bitcoin transaction byte array
 library BTC {
