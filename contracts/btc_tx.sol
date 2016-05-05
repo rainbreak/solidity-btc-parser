@@ -85,48 +85,90 @@ library BTC {
                  + uint(data[pos + 6]) * 2 ** 56;
         }
     }
-    function getFirstTwoOutputs(bytes txBytes) returns (uint, uint, uint,
-                                                        uint, uint, uint)
+    function getFirstTwoOutputs(bytes txBytes)
+             returns (uint, uint, uint, uint)
     {
         uint pos;
-        uint n_inputs;
-        uint n_outputs;
-        uint script_len;
+        uint[] memory input_script_lens;
+        uint[] memory output_script_lens;
+        uint[] memory output_values;
 
         pos = 4;  // skip version
 
+        (input_script_lens, pos) = scanInputs(txBytes, pos, 0);
+
+        (output_values, output_script_lens, pos) = scanOutputs(txBytes, pos, 2);
+
+        return (output_values[0], output_script_lens[0],
+                output_values[1], output_script_lens[1]);
+    }
+    // scan the inputs and find the script lengths.
+    // return an array of script lengths and the end position
+    // of the inputs.
+    // takes a 'stop' argument which sets how many inputs to
+    // scan through. stop=0 => scan all.
+    function scanInputs(bytes txBytes, uint pos, uint stop)
+             returns (uint[], uint)
+    {
+        uint n_inputs;
+        uint halt;
+        uint script_len;
+
         (n_inputs, pos) = parseVarInt(txBytes, pos);
 
-        for (var i = 0; i < n_inputs; i++) {
+        if (stop == 0) {
+            halt = n_inputs;
+        } else if (stop > n_inputs) {
+            throw;
+        } else {
+            halt = stop;
+        }
+
+        uint[] memory script_lens = new uint[](halt);
+
+        for (var i = 0; i < halt; i++) {
             pos += 36;  // skip outpoint
             (script_len, pos) = parseVarInt(txBytes, pos);
+            script_lens[i] = script_len;
             pos += script_len + 4;  // skip sig_script, seq
         }
 
+        return (script_lens, pos);
+    }
+    // scan the outputs and find the values and script lengths.
+    // return array of values, array of script lengths and the
+    // end position of the outputs.
+    // takes a 'stop' argument which sets how many outputs to
+    // scan through. stop=0 => scan all.
+    function scanOutputs(bytes txBytes, uint pos, uint stop)
+             returns (uint[], uint[], uint)
+    {
+        uint n_outputs;
+        uint halt;
+        uint script_len;
+
         (n_outputs, pos) = parseVarInt(txBytes, pos);
 
-        if (n_outputs < 2) {
-            return;
+        if (stop == 0) {
+            halt = n_outputs;
+        } else if (stop > n_outputs) {
+            throw;
+        } else {
+            halt = stop;
         }
-        // first ouput
-        var out_value_1 = getBytesLE(txBytes, pos, 64);
-        pos += 8;
 
-        (script_len, pos) = parseVarInt(txBytes, pos);
-        var script_start_1 = pos;
-        var script_end_1 = pos + script_len;
-        pos += script_len;
+        uint[] memory script_lens = new uint[](halt);
+        uint[] memory output_values = new uint[](halt);
 
-        // second output
-        var out_value_2 = getBytesLE(txBytes, pos, 64);
-        pos += 8;
+        for (var i = 0; i < halt; i++) {
+            output_values[i] = getBytesLE(txBytes, pos, 64);
+            pos += 8;
 
-        (script_len, pos) = parseVarInt(txBytes, pos);
-        var script_start_2 = pos;
-        var script_end_2 = pos + script_len;
-        pos += script_len;
+            (script_len, pos) = parseVarInt(txBytes, pos);
+            script_lens[i] = (script_len);
+            pos += script_len;
+        }
 
-        return (out_value_1, script_start_1, script_end_1,
-                out_value_2, script_start_2, script_end_2);
+        return (output_values, script_lens, pos);
     }
 }
