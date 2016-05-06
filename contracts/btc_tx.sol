@@ -47,6 +47,13 @@
 
 // parse a raw bitcoin transaction byte array
 library BTC {
+    uint constant BYTES_1 = 2 ** 8;
+    uint constant BYTES_2 = 2 ** 16;
+    uint constant BYTES_3 = 2 ** 24;
+    uint constant BYTES_4 = 2 ** 32;
+    uint constant BYTES_5 = 2 ** 40;
+    uint constant BYTES_6 = 2 ** 48;
+    uint constant BYTES_7 = 2 ** 56;
     // Convert a variable integer into something useful and return it and
     // the index to after it.
     function parseVarInt(bytes txBytes, uint pos) returns (uint, uint) {
@@ -67,22 +74,22 @@ library BTC {
     // convert little endian bytes to uint
     function getBytesLE(bytes data, uint pos, uint bits) returns (uint) {
         if (bits == 16) {
-            return uint(data[pos])
-                 + uint(data[pos + 1]) * 2**8;
+            return uint16(data[pos])
+                 + uint16(data[pos + 1]) * BYTES_1;
         } else if (bits == 32) {
-            return uint(data[pos])
-                 + uint(data[pos + 1]) * 2 ** 8
-                 + uint(data[pos + 2]) * 2 ** 16
-                 + uint(data[pos + 3]) * 2 ** 24;
+            return uint32(data[pos])
+                 + uint32(data[pos + 1]) * BYTES_1
+                 + uint32(data[pos + 2]) * BYTES_2
+                 + uint32(data[pos + 3]) * BYTES_3;
         } else if (bits == 64) {
-            return uint(data[pos])
-                 + uint(data[pos + 1]) * 2 ** 8
-                 + uint(data[pos + 2]) * 2 ** 16
-                 + uint(data[pos + 3]) * 2 ** 24
-                 + uint(data[pos + 4]) * 2 ** 32
-                 + uint(data[pos + 5]) * 2 ** 40
-                 + uint(data[pos + 6]) * 2 ** 48
-                 + uint(data[pos + 6]) * 2 ** 56;
+            return uint64(data[pos])
+                 + uint64(data[pos + 1]) * BYTES_1
+                 + uint64(data[pos + 2]) * BYTES_2
+                 + uint64(data[pos + 3]) * BYTES_3
+                 + uint64(data[pos + 4]) * BYTES_4
+                 + uint64(data[pos + 5]) * BYTES_5
+                 + uint64(data[pos + 6]) * BYTES_6
+                 + uint64(data[pos + 7]) * BYTES_7;
         }
     }
     function getFirstTwoOutputs(bytes txBytes)
