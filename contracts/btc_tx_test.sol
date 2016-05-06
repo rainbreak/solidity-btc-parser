@@ -102,4 +102,23 @@ contract BTCTxTest is Test {
         assertEq0(data, array_data);
         assertEq0(raw_data, array_data);
     }
+    function testGetFirstTwoOutputs() {
+        // transaction data generated with ./generate_bitcoin_transaction.sh
+        // txid: 015bb217e9b83dd5d9d1c26e856873ff10325fc77141a153cb1df2a43f3d1033
+        // value: 12345678
+        // value: 11223344
+        // address: 1MaTeTiCCGFvgmZxK2R1pmD9LDWvkmU9BS
+        // address: 16A81uRvSkHCn6Kpm7dLWM9Du9E9cwBPkM
+        // script: OP_DUP OP_HASH160 e1b67c3a7f8977fac55a15dbdb19c7a175676d73 OP_EQUALVERIFY OP_CHECKSIG
+        // script: OP_DUP OP_HASH160 38923a989763397163a08d5498d903a0b86b9ac9 OP_EQUALVERIFY OP_CHECKSIG
+        bytes memory transaction = "\x01\x00\x00\x00\x01\xa5\x8c\xbb\xcb\xad\x45\x62\x5f\x5e\xd1\xf2\x04\x58\xf3\x93\xfe\x1d\x15\x07\xe2\x54\x26\x5f\x09\xd9\x74\x62\x32\xda\x48\x00\x24\x00\x00\x00\x00\x00\xff\xff\xff\xff\x02\x4e\x61\xbc\x00\x00\x00\x00\x00\x19\x76\xa9\x14\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73\x88\xac\x30\x41\xab\x00\x00\x00\x00\x00\x19\x76\xa9\x14\x38\x92\x3a\x98\x97\x63\x39\x71\x63\xa0\x8d\x54\x98\xd9\x03\xa0\xb8\x6b\x9a\xc9\x88\xac\x00\x00\x00\x00";
+
+        var (ov1, os1, ov2, os2) = BTC.getFirstTwoOutputs(transaction);
+
+        // expected output values in satoshis
+        uint ev1 = 12345678;
+        uint ev2 = 11223344;
+        assertEq(uint(ov1), ev1);
+        assertEq(uint(ov2), ev2);
+    }
 }
