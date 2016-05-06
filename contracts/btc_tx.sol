@@ -73,7 +73,9 @@ library BTC {
     }
     // convert little endian bytes to uint
     function getBytesLE(bytes data, uint pos, uint bits) returns (uint) {
-        if (bits == 16) {
+        if (bits == 8) {
+            return uint8(data[pos]);
+        } else if (bits == 16) {
             return uint16(data[pos])
                  + uint16(data[pos + 1]) * BYTES_1;
         } else if (bits == 32) {
