@@ -4,6 +4,12 @@ import 'btc_tx.sol';
 contract BTCTxTest is Test {
     function setUp() {
     }
+    function testGetBytesLE8() {
+        bytes memory data = new bytes(1);
+        data[0] = 0xfa;
+        var val = BTC.getBytesLE(data, 0, 8);
+        assertEq(val, 250);
+    }
     function testGetBytesLE16() {
         bytes memory data = new bytes(2);
         data[0] = 0x02;
