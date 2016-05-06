@@ -86,4 +86,20 @@ contract BTCTxTest is Test {
         (val, pos) = BTC.parseVarInt(data, 0);
         assertEq(val, 144396663052566528);
     }
+    // check how solidity deals with partially decoded byte strings.
+    // In Python, '\x' characters will be presented decoded if possible.
+    function testSolidityBytesEquivalence() {
+        // original hex: '01 00 00 00 01 5b 2b 99'
+        bytes memory data = '\x01[+\x99';
+        bytes memory raw_data = '\x01\x5b\x2b\x99';
+        bytes memory array_data = new bytes(4);
+        array_data[0] = 0x01;
+        array_data[1] = 0x5b;
+        array_data[2] = 0x2b;
+        array_data[3] = 0x99;
+
+        assertEq0(data, raw_data);
+        assertEq0(data, array_data);
+        assertEq0(raw_data, array_data);
+    }
 }
