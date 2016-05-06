@@ -53,28 +53,37 @@ contract BTCTxTest is Test {
     function testParseVarInt16() {
         bytes memory data = new bytes(3);
         data[0] = 0xfd;
-        data[1] = 0x00;
-        data[2] = 0x00;
         var (val, pos) = BTC.parseVarInt(data, 0);
         assertEq(val, 0);
         assertEq(pos, 3);
+
+        data[1] = 0x01;
+        data[2] = 0x02;
+        (val, pos) = BTC.parseVarInt(data, 0);
+        assertEq(val, 513);
     }
     function testParseVarInt32() {
         bytes memory data = new bytes(5);
         data[0] = 0xfe;
-        data[1] = 0x00;
-        data[2] = 0x00;
         var (val, pos) = BTC.parseVarInt(data, 0);
         assertEq(val, 0);
         assertEq(pos, 5);
+
+        data[3] = 0x01;
+        data[4] = 0x02;
+        (val, pos) = BTC.parseVarInt(data, 0);
+        assertEq(val, 33619968);
     }
     function testParseVarInt64() {
         bytes memory data = new bytes(9);
         data[0] = 0xff;
-        data[1] = 0x00;
-        data[2] = 0x00;
         var (val, pos) = BTC.parseVarInt(data, 0);
         assertEq(val, 0);
         assertEq(pos, 9);
+
+        data[7] = 0x01;
+        data[8] = 0x02;
+        (val, pos) = BTC.parseVarInt(data, 0);
+        assertEq(val, 144396663052566528);
     }
 }
