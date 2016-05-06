@@ -64,11 +64,11 @@ library BTC {
         if (ibit < 0xfd) {
             return (ibit, pos);
         } else if (ibit == 0xfd) {
-            return (getBytesLE(txBytes, pos, 16), pos + 3);
+            return (getBytesLE(txBytes, pos, 16), pos + 2);
         } else if (ibit == 0xfe) {
-            return (getBytesLE(txBytes, pos, 32), pos + 5);
+            return (getBytesLE(txBytes, pos, 32), pos + 4);
         } else if (ibit == 0xff) {
-            return (getBytesLE(txBytes, pos, 64), pos + 9);
+            return (getBytesLE(txBytes, pos, 64), pos + 8);
         }
     }
     // convert little endian bytes to uint
