@@ -4,20 +4,20 @@ import 'btc_tx.sol';
 contract BTCTxTest is Test {
     function setUp() {
     }
-    function testGetBytesLE8() {
+    function testGetBytesLittleEndian8() {
         bytes memory data = new bytes(1);
         data[0] = 0xfa;
         var val = BTC.getBytesLE(data, 0, 8);
         assertEq(val, 250);
     }
-    function testGetBytesLE16() {
+    function testGetBytesLittleEndian16() {
         bytes memory data = new bytes(2);
         data[0] = 0x02;
         data[1] = 0x01;
         var val = BTC.getBytesLE(data, 0, 16);
         assertEq(val, 258);
     }
-    function testGetBytesLE32() {
+    function testGetBytesLittleEndian32() {
         bytes memory data = new bytes(4);
         data[0] = 0x04;
         data[1] = 0x03;
@@ -26,7 +26,7 @@ contract BTCTxTest is Test {
         var val = BTC.getBytesLE(data, 0, 32);
         assertEq(val, 16909060);
     }
-    function testGetBytesLE64() {
+    function testGetBytesLittleEndian64() {
         bytes memory data = new bytes(8);
         data[0] = 0x08;
         data[1] = 0x07;
