@@ -44,4 +44,13 @@ contract BTCTxTest is Test {
         (ret, pos) = BTC.parseVarInt(data, 0);
         assertEq(ret, 252);
     }
+    function testParseVarInt16() {
+        bytes memory data = new bytes(3);
+        data[0] = 0xfd;
+        data[1] = 0x00;
+        data[2] = 0x00;
+        var (ret, pos) = BTC.parseVarInt(data, 0);
+        assertEq(ret, 0);
+        assertEq(pos, 3);
+    }
 }
