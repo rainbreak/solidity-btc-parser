@@ -200,4 +200,26 @@ library BTC {
 
         return (output_values, script_lens, pos);
     }
+    function assert(bool assertion) internal {
+        if (!assertion) throw;
+    }
+    // Get the pubkeyhash from an output script. Assumes standard
+    // pay-to-pubkey-hash (P2PKH) transaction, i.e. NOT P2SH / Multisig.
+    // Returns the pubkeyhash and the end position of the script.
+    function parseOutputScript(bytes txBytes, uint pos, uint script_len)
+             returns (bytes pubkeyhash)
+    {
+        assert(txBytes[0] == 0x76);   // OP_DUP
+        assert(txBytes[1] == 0xa9);   // OP_HASH160
+        assert(txBytes[2] == 0x14);   // bytes to push
+        assert(script_len == 25);     // 20 byte pubkeyhash + 5 bytes of script
+        assert(txBytes[23] == 0x88);  // OP_EQUALVERIFY
+        assert(txBytes[24] == 0xac);  // OP_CHECKSIG
+
+        for (var i = 0; i < 20; i++) {
+            pubkeyhash[i] = txBytes[i + 3];
+        }
+
+        return pubkeyhash;
+    }
 }
