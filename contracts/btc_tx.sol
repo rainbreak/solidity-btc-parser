@@ -44,6 +44,26 @@
 // <=0xFFFF (65535)| 3      | 0xFD followed by length as uint16
 // <=0xFFFF FFFF   | 5      | 0xFE followed by length as uint32
 // -               | 9      | 0xFF followed by length as uint64
+//
+// Public key scripts `pk_script` are set on the output and can
+// take a number of forms. The regular transaction script is
+// called 'pay-to-pubkey-hash':
+//
+// OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
+//
+// OP_x are Bitcoin script opcodes. The bytes representation is:
+//
+// 0x76 0xA9 0x14 <pubKeyHash> 0x88 0xAC
+//
+// The <pubKeyHash> is the ripemd160 hash of the sha256 hash of
+// the public key, preceded by a network version byte. (21 bytes total)
+//
+// Network version bytes: 0x00 (mainnet); 0x6f (testnet); 0x34 (namecoin)
+//
+// The Bitcoin address is derived from the pubKeyHash. The binary form is the
+// pubKeyHash, plus a checksum at the end.  The checksum is the first 4 bytes
+// of the (32 byte) double sha256 of the pubKeyHash. (25 bytes total)
+// This is converted to base58 to form the publicly used Bitcoin address.
 
 // parse a raw bitcoin transaction byte array
 library BTC {
