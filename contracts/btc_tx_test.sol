@@ -21,7 +21,7 @@ contract BTCTxTest is Test {
         assertEq(val, 16909060);
     }
     function testGetBytesLE64() {
-        bytes memory data = new bytes(4);
+        bytes memory data = new bytes(8);
         data[0] = 0x08;
         data[1] = 0x07;
         data[2] = 0x06;
