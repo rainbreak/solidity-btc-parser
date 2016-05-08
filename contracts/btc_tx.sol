@@ -140,6 +140,20 @@ library BTC {
         return (output_values[0], output_addresses[0],
                 output_values[1], output_addresses[1]);
     }
+    // Check whether `btcAddress` is in the transaction outputs *and*
+    // whether *at least* `value` has been sent to it.
+    function checkValueSent(bytes txBytes, bytes20 btcAddress, uint value)
+             returns (bool)
+    {
+        var (value1, address1, value2, address2) = getFirstTwoOutputs(txBytes);
+        if (btcAddress == address1 && value1 >= value) {
+            return true;
+        } else if (btcAddress == address2 && value2 >= value) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     // scan the inputs and find the script lengths.
     // return an array of script lengths and the end position
     // of the inputs.
