@@ -121,4 +121,12 @@ contract BTCTxTest is Test {
         assertEq(uint(ov1), ev1);
         assertEq(uint(ov2), ev2);
     }
+    function testParseOutputScript() logs_gas() {
+        bytes memory pk_script = "\x76\xa9\x14\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73\x88\xac";
+        bytes20 rpkhash = bytes20("\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73");
+
+        var pkhash = BTC.parseOutputScript(pk_script, 0, 25);
+
+        assertEq20(pkhash, rpkhash);
+    }
 }

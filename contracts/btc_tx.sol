@@ -207,19 +207,72 @@ library BTC {
     // pay-to-pubkey-hash (P2PKH) transaction, i.e. NOT P2SH / Multisig.
     // Returns the pubkeyhash and the end position of the script.
     function parseOutputScript(bytes txBytes, uint pos, uint script_len)
-             returns (bytes pubkeyhash)
+             returns (bytes20)
     {
-        assert(txBytes[0] == 0x76);   // OP_DUP
-        assert(txBytes[1] == 0xa9);   // OP_HASH160
-        assert(txBytes[2] == 0x14);   // bytes to push
-        assert(script_len == 25);     // 20 byte pubkeyhash + 5 bytes of script
-        assert(txBytes[23] == 0x88);  // OP_EQUALVERIFY
-        assert(txBytes[24] == 0xac);  // OP_CHECKSIG
+        assert(txBytes[pos] == 0x76);       // OP_DUP
+        assert(txBytes[pos + 1] == 0xa9);   // OP_HASH160
+        assert(txBytes[pos + 2] == 0x14);   // bytes to push
+        assert(script_len == 25);           // 20 byte pubkeyhash + 5 bytes of script
+        assert(txBytes[pos + 23] == 0x88);  // OP_EQUALVERIFY
+        assert(txBytes[pos + 24] == 0xac);  // OP_CHECKSIG
 
-        for (var i = 0; i < 20; i++) {
-            pubkeyhash[i] = txBytes[i + 3];
+        // TODO: this is well inefficient to be doing every time
+        Bytes BYTES = new Bytes();
+
+        uint160 pubkeyhash = 0;
+        for (uint160 i = 0; i < 20; i++) {
+            pubkeyhash += uint160(txBytes[i + pos + 3]) * BYTES.b160(i);
         }
+        return bytes20(pubkeyhash);
+    }
+}
 
-        return pubkeyhash;
+// library can't have non constant state variables, so create the
+// precomputed powers array in a contract.
+contract Bytes {
+    uint160 constant BYTES_1 = 2 ** 8;
+    uint160 constant BYTES_2 = 2 ** 16;
+    uint160 constant BYTES_3 = 2 ** 24;
+    uint160 constant BYTES_4 = 2 ** 32;
+    uint160 constant BYTES_5 = 2 ** 40;
+    uint160 constant BYTES_6 = 2 ** 48;
+    uint160 constant BYTES_7 = 2 ** 56;
+    uint160 constant BYTES_8 = 2 ** 64;
+    uint160 constant BYTES_9 = 2 ** 72;
+    uint160 constant BYTES_10 = 2 ** 80;
+    uint160 constant BYTES_11 = 2 ** 88;
+    uint160 constant BYTES_12 = 2 ** 96;
+    uint160 constant BYTES_13 = 2 ** 104;
+    uint160 constant BYTES_14 = 2 ** 112;
+    uint160 constant BYTES_15 = 2 ** 120;
+    uint160 constant BYTES_16 = 2 ** 128;
+    uint160 constant BYTES_17 = 2 ** 136;
+    uint160 constant BYTES_18 = 2 ** 144;
+    uint160 constant BYTES_19 = 2 ** 152;
+
+    uint160[20] public BYTES_160 = [BYTES_19,
+                                    BYTES_18,
+                                    BYTES_17,
+                                    BYTES_16,
+                                    BYTES_15,
+                                    BYTES_14,
+                                    BYTES_13,
+                                    BYTES_12,
+                                    BYTES_11,
+                                    BYTES_10,
+                                    BYTES_9,
+                                    BYTES_8,
+                                    BYTES_7,
+                                    BYTES_6,
+                                    BYTES_5,
+                                    BYTES_4,
+                                    BYTES_3,
+                                    BYTES_2,
+                                    BYTES_1,
+                                    1];
+    function Bytes(){
+    }
+    function b160(uint i) returns (uint160){
+        return BYTES_160[i];
     }
 }
