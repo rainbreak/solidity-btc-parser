@@ -114,22 +114,31 @@ library BTC {
                  + uint64(data[pos + 7]) * BYTES_7;
         }
     }
+    // scan the full transaction bytes and return the first two output
+    // values (in satoshis) and addresses (in binary)
     function getFirstTwoOutputs(bytes txBytes)
-             returns (uint, uint, uint, uint)
+             returns (uint, bytes20, uint, bytes20)
     {
         uint pos;
-        uint[] memory input_script_lens;
-        uint[] memory output_script_lens;
-        uint[] memory output_values;
+        uint[] memory input_script_lens = new uint[](2);
+        uint[] memory output_script_lens = new uint[](2);
+        uint[] memory script_starts = new uint[](2);
+        uint[] memory output_values = new uint[](2);
+        bytes20[] memory output_addresses = new bytes20[](2);
 
         pos = 4;  // skip version
 
         (input_script_lens, pos) = scanInputs(txBytes, pos, 0);
 
-        (output_values, output_script_lens, pos) = scanOutputs(txBytes, pos, 2);
+        (output_values, script_starts, output_script_lens, pos) = scanOutputs(txBytes, pos, 2);
 
-        return (output_values[0], output_script_lens[0],
-                output_values[1], output_script_lens[1]);
+        for (uint i = 0; i < 2; i++) {
+            var pkhash = parseOutputScript(txBytes, script_starts[i], output_script_lens[i]);
+            output_addresses[i] = pkhash;
+        }
+
+        return (output_values[0], output_addresses[0],
+                output_values[1], output_addresses[1]);
     }
     // scan the inputs and find the script lengths.
     // return an array of script lengths and the end position
@@ -170,7 +179,7 @@ library BTC {
     // takes a 'stop' argument which sets how many outputs to
     // scan through. stop=0 => scan all.
     function scanOutputs(bytes txBytes, uint pos, uint stop)
-             returns (uint[], uint[], uint)
+             returns (uint[], uint[], uint[], uint)
     {
         uint n_outputs;
         uint halt;
@@ -186,6 +195,7 @@ library BTC {
             halt = stop;
         }
 
+        uint[] memory script_starts = new uint[](halt);
         uint[] memory script_lens = new uint[](halt);
         uint[] memory output_values = new uint[](halt);
 
@@ -194,11 +204,12 @@ library BTC {
             pos += 8;
 
             (script_len, pos) = parseVarInt(txBytes, pos);
-            script_lens[i] = (script_len);
+            script_starts[i] = pos;
+            script_lens[i] = script_len;
             pos += script_len;
         }
 
-        return (output_values, script_lens, pos);
+        return (output_values, script_starts, script_lens, pos);
     }
     function assert(bool assertion) internal {
         if (!assertion) throw;
