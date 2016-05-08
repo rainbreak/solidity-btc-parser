@@ -224,19 +224,19 @@ library BTC {
         assert(txBytes[pos + 24] == 0xac);  // OP_CHECKSIG
 
         // TODO: this is well inefficient to be doing every time
-        Bytes BYTES = new Bytes();
+        Bytes160 BYTES160 = new Bytes160();
 
         uint160 pubkeyhash = 0;
         for (uint160 i = 0; i < 20; i++) {
-            pubkeyhash += uint160(txBytes[i + pos + 3]) * BYTES.b160(i);
+            pubkeyhash += uint160(txBytes[i + pos + 3]) * BYTES160.get(i);
         }
         return bytes20(pubkeyhash);
     }
 }
 
-// library can't have non constant state variables, so create the
-// precomputed powers array in a contract.
-contract Bytes {
+// library can't have non constant state variables and constant arrays
+// are not yet supported, so create the precomputed powers array in a contract.
+contract Bytes160 {
     uint160 constant BYTES_1 = 2 ** 8;
     uint160 constant BYTES_2 = 2 ** 16;
     uint160 constant BYTES_3 = 2 ** 24;
@@ -277,9 +277,8 @@ contract Bytes {
                                     BYTES_2,
                                     BYTES_1,
                                     1];
-    function Bytes(){
-    }
-    function b160(uint i) returns (uint160){
+
+    function get(uint i) constant returns (uint160){
         return BYTES_160[i];
     }
 }
