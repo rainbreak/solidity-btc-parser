@@ -143,8 +143,8 @@ library BTC {
     // scan the inputs and find the script lengths.
     // return an array of script lengths and the end position
     // of the inputs.
-    // takes a 'stop' argument which sets how many inputs to
-    // scan through. stop=0 => scan all.
+    // takes a 'stop' argument which sets the maximum number of
+    // outputs to scan through. stop=0 => scan all.
     function scanInputs(bytes txBytes, uint pos, uint stop)
              returns (uint[], uint)
     {
@@ -154,10 +154,8 @@ library BTC {
 
         (n_inputs, pos) = parseVarInt(txBytes, pos);
 
-        if (stop == 0) {
+        if (stop == 0 || stop > n_inputs) {
             halt = n_inputs;
-        } else if (stop > n_inputs) {
-            throw;
         } else {
             halt = stop;
         }
@@ -176,8 +174,8 @@ library BTC {
     // scan the outputs and find the values and script lengths.
     // return array of values, array of script lengths and the
     // end position of the outputs.
-    // takes a 'stop' argument which sets how many outputs to
-    // scan through. stop=0 => scan all.
+    // takes a 'stop' argument which sets the maximum number of
+    // outputs to scan through. stop=0 => scan all.
     function scanOutputs(bytes txBytes, uint pos, uint stop)
              returns (uint[], uint[], uint[], uint)
     {
@@ -187,10 +185,8 @@ library BTC {
 
         (n_outputs, pos) = parseVarInt(txBytes, pos);
 
-        if (stop == 0) {
+        if (stop == 0 || stop > n_outputs) {
             halt = n_outputs;
-        } else if (stop > n_outputs) {
-            throw;
         } else {
             halt = stop;
         }
