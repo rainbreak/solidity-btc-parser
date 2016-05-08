@@ -89,7 +89,7 @@ contract BTCTxTest is Test {
     // check how solidity deals with partially decoded byte strings.
     // In Python, '\x' characters will be presented decoded if possible.
     function testSolidityBytesEquivalence() {
-        // original hex: '01 00 00 00 01 5b 2b 99'
+        // original hex: '01 5b 2b 99'
         bytes memory data = '\x01[+\x99';
         bytes memory raw_data = '\x01\x5b\x2b\x99';
         bytes memory array_data = new bytes(4);
