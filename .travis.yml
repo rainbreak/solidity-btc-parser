@@ -1,0 +1,13 @@
+sudo: required
+dist: trusty
+
+services:
+  docker
+
+before_install:
+  - id
+  - docker pull rainbeam/dapple-minimal
+  - cp .travis.dapplerc $HOME/.dapplerc
+
+script:
+  - ./.travis.dapple-docker-entry test
