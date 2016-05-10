@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/rainbeam/solidity-btc-parser.svg?branch=master)](https://travis-ci.org/rainbeam/solidity-btc-parser)
+
 ## Bitcoin transaction parsing library for Solidity
 
 This is a library of useful functions for dealing with raw Bitcoin
