@@ -66,7 +66,7 @@
 // This is converted to base58 to form the publicly used Bitcoin address.
 
 // parse a raw bitcoin transaction byte array
-library BTC {
+contract BTCTxParser {
     uint constant BYTES_1 = 2 ** 8;
     uint constant BYTES_2 = 2 ** 16;
     uint constant BYTES_3 = 2 ** 24;

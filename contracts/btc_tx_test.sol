@@ -2,7 +2,9 @@ import 'dapple/test.sol';
 import 'btc_tx.sol';
 
 contract BTCTxTest is Test {
+    BTCTxParser BTC;
     function setUp() {
+        BTC = new BTCTxParser();
     }
     function testGetBytesLittleEndian8() {
         bytes memory data = new bytes(1);
