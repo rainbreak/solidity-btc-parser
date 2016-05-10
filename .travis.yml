@@ -7,7 +7,7 @@ services:
 before_install:
   - id
   - docker pull rainbeam/dapple-minimal
-  - cp .travis.dapplerc $HOME/.dapplerc
+  - cp ci/mock.dapplerc $HOME/.dapplerc
 
 script:
-  - ./.travis.dapple-docker-entry test
+  - ci/dapple-docker-entry test
