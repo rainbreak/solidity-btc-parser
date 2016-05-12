@@ -83,8 +83,8 @@ newTxHash() {
 newTransaction() {
     bitcoin-tx -create -json \
         in=$(newTxHash):0 \
-        outaddr=0.12345678:$(newBitcoinAddress) \
-        outaddr=0.11223344:$(newBitcoinAddress)
+        outaddr=$1:$(newBitcoinAddress) \
+        outaddr=$2:$(newBitcoinAddress)
 }
 
 hexLiteral() {
@@ -92,7 +92,7 @@ hexLiteral() {
 }
 
 # redirect openssl stderr to null
-tx=$(newTransaction 2> /dev/null)
+tx=$(newTransaction ${1:-0.12345678} ${2:-0.11223344} 2> /dev/null)
 
 # create \x escaped hex string and insert as additional element
 tx_hex_literal=$(echo $tx | jq -r .hex | hexLiteral)
