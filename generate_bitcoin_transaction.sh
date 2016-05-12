@@ -100,4 +100,10 @@ txid_hex_literal=$(echo $tx | jq -r .txid | hexLiteral)
 
 tx_hexl=$(echo $tx | jq --arg hexl $tx_hex_literal --arg txidl $txid_hex_literal '. + {$hexl} + {$txidl}')
 
-echo $tx_hexl | jq -r '@text "txid: \(.txid)", @text "txid literal: \(.txidl)", @text "value: \(.vout[].value * 1E8)", @text "address: \(.vout[].scriptPubKey.addresses[0])", @text "script: \(.vout[].scriptPubKey.asm)", @text "hex: \(.hex)", @text "hex literal: \(.hexl)"'
+echo $tx_hexl | jq -r '@text "txid: \(.txid)",
+                       @text "txid literal: \(.txidl)",
+                       @text "value: \(.vout[].value * 1E8)",
+                       @text "address: \(.vout[].scriptPubKey.addresses[0])",
+                       @text "script: \(.vout[].scriptPubKey.asm)",
+                       @text "hex: \(.hex)",
+                       @text "hex literal: \(.hexl)"'
