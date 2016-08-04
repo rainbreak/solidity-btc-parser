@@ -80,6 +80,17 @@ newTxHash() {
     echo 'fake tx' | openssl dgst -sha256 -binary | xxd -p | tr -d '\n'
 }
 
+concatOutputs() {
+    local i=1
+    local out=
+    while [ $i -le $1 ]; do
+        local outaddr=$i:$(newBitcoinAddress 2> /dev/null)
+        local out="$out $outaddr"
+        let 'i++'
+    done
+    echo $out 2> /dev/null
+}
+
 newTransaction() {
     bitcoin-tx -create -json \
         in=$(newTxHash):0 \
@@ -87,12 +98,29 @@ newTransaction() {
         outaddr=$2:$(newBitcoinAddress)
 }
 
+newMultiTransaction() {
+    bitcoin-tx -create -json \
+        in=$(newTxHash):0 \
+        outaddr=$1:$(newBitcoinAddress) \
+        outaddr=$2:$(newBitcoinAddress) \
+        outaddr=$3:$(newBitcoinAddress) \
+        outaddr=$4:$(newBitcoinAddress) \
+        outaddr=$5:$(newBitcoinAddress)
+}
+
 hexLiteral() {
     sed 's/../\\x\0/g'
 }
 
-# redirect openssl stderr to null
-tx=$(newTransaction ${1:-0.12345678} ${2:-0.11223344} 2> /dev/null)
+
+if [ "$1" == "" ]; then
+    tx=$(newTransaction ${1:-0.12345678} ${2:-0.11223344} 2> /dev/null)
+elif [ "$1" == "multi" ]; then
+    tx=$(newMultiTransaction ${2:-0.12345678} ${3:-0.11223344} ${4:-0.33333333} ${5:-0.44444444} ${6:-0.55555555} 2> /dev/null)
+else
+    echo "bad argument"
+    exit 1
+fi
 
 # create \x escaped hex string and insert as additional element
 tx_hex_literal=$(echo $tx | jq -r .hex | hexLiteral)
