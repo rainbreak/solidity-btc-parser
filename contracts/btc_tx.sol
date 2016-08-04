@@ -194,13 +194,18 @@ contract BTCTxParser is Bytes160 {
     function checkValueSent(bytes txBytes, bytes20 btcAddress, uint value)
              returns (bool)
     {
-        var (value1, address1, value2, address2) = getFirstTwoOutputs(txBytes);
-        if (btcAddress == address1 && value1 >= value) {
-            return true;
-        } else if (btcAddress == address2 && value2 >= value) {
-            return true;
-        } else {
-            return false;
+        uint pos = 4;  // skip version
+        (, pos) = scanInputs(txBytes, pos, 0);  // find end of inputs
+
+        // scan *all* the outputs and find where they are
+        var (output_values, script_starts, output_script_lens,) = scanOutputs(txBytes, pos, 0);
+
+        // look at each output and check whether it at least value to btcAddress
+        for (uint i = 0; i < output_values.length; i++) {
+            var pkhash = parseOutputScript(txBytes, script_starts[i], output_script_lens[i]);
+            if (pkhash == btcAddress && output_values[i] >= value) {
+                return true;
+            }
         }
     }
     // scan the inputs and find the script lengths.
