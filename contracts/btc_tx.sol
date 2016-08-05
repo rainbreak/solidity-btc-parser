@@ -84,64 +84,8 @@
 // Addresses are the scriptHash with a version prefix of 5, encoded as
 // Base58check. These addresses begin with a '3'.
 
-// library can't have non constant state variables and constant arrays
-// are not yet supported, so create the precomputed powers array in a contract.
-contract Bytes160 {
-    uint160 constant BYTES_1 = 2 ** 8;
-    uint160 constant BYTES_2 = 2 ** 16;
-    uint160 constant BYTES_3 = 2 ** 24;
-    uint160 constant BYTES_4 = 2 ** 32;
-    uint160 constant BYTES_5 = 2 ** 40;
-    uint160 constant BYTES_6 = 2 ** 48;
-    uint160 constant BYTES_7 = 2 ** 56;
-    uint160 constant BYTES_8 = 2 ** 64;
-    uint160 constant BYTES_9 = 2 ** 72;
-    uint160 constant BYTES_10 = 2 ** 80;
-    uint160 constant BYTES_11 = 2 ** 88;
-    uint160 constant BYTES_12 = 2 ** 96;
-    uint160 constant BYTES_13 = 2 ** 104;
-    uint160 constant BYTES_14 = 2 ** 112;
-    uint160 constant BYTES_15 = 2 ** 120;
-    uint160 constant BYTES_16 = 2 ** 128;
-    uint160 constant BYTES_17 = 2 ** 136;
-    uint160 constant BYTES_18 = 2 ** 144;
-    uint160 constant BYTES_19 = 2 ** 152;
-
-    uint160[20] public BYTES_160 = [BYTES_19,
-                                    BYTES_18,
-                                    BYTES_17,
-                                    BYTES_16,
-                                    BYTES_15,
-                                    BYTES_14,
-                                    BYTES_13,
-                                    BYTES_12,
-                                    BYTES_11,
-                                    BYTES_10,
-                                    BYTES_9,
-                                    BYTES_8,
-                                    BYTES_7,
-                                    BYTES_6,
-                                    BYTES_5,
-                                    BYTES_4,
-                                    BYTES_3,
-                                    BYTES_2,
-                                    BYTES_1,
-                                    1];
-
-    function get(uint i) constant returns (uint160){
-        return BYTES_160[i];
-    }
-}
-
 // parse a raw bitcoin transaction byte array
-contract BTCTxParser is Bytes160 {
-    uint constant BYTES_1 = 2 ** 8;
-    uint constant BYTES_2 = 2 ** 16;
-    uint constant BYTES_3 = 2 ** 24;
-    uint constant BYTES_4 = 2 ** 32;
-    uint constant BYTES_5 = 2 ** 40;
-    uint constant BYTES_6 = 2 ** 48;
-    uint constant BYTES_7 = 2 ** 56;
+library BTC {
     // Convert a variable integer into something useful and return it and
     // the index to after it.
     function parseVarInt(bytes txBytes, uint pos) returns (uint, uint) {
@@ -165,21 +109,21 @@ contract BTCTxParser is Bytes160 {
             return uint8(data[pos]);
         } else if (bits == 16) {
             return uint16(data[pos])
-                 + uint16(data[pos + 1]) * BYTES_1;
+                 + uint16(data[pos + 1]) * 2 ** 8;
         } else if (bits == 32) {
             return uint32(data[pos])
-                 + uint32(data[pos + 1]) * BYTES_1
-                 + uint32(data[pos + 2]) * BYTES_2
-                 + uint32(data[pos + 3]) * BYTES_3;
+                 + uint32(data[pos + 1]) * 2 ** 8
+                 + uint32(data[pos + 2]) * 2 ** 16
+                 + uint32(data[pos + 3]) * 2 ** 24;
         } else if (bits == 64) {
             return uint64(data[pos])
-                 + uint64(data[pos + 1]) * BYTES_1
-                 + uint64(data[pos + 2]) * BYTES_2
-                 + uint64(data[pos + 3]) * BYTES_3
-                 + uint64(data[pos + 4]) * BYTES_4
-                 + uint64(data[pos + 5]) * BYTES_5
-                 + uint64(data[pos + 6]) * BYTES_6
-                 + uint64(data[pos + 7]) * BYTES_7;
+                 + uint64(data[pos + 1]) * 2 ** 8
+                 + uint64(data[pos + 2]) * 2 ** 16
+                 + uint64(data[pos + 3]) * 2 ** 24
+                 + uint64(data[pos + 4]) * 2 ** 32
+                 + uint64(data[pos + 5]) * 2 ** 40
+                 + uint64(data[pos + 6]) * 2 ** 48
+                 + uint64(data[pos + 7]) * 2 ** 56;
         }
     }
     // scan the full transaction bytes and return the first two output
@@ -301,7 +245,7 @@ contract BTCTxParser is Bytes160 {
     function sliceBytes20(bytes data, uint start) returns (bytes20) {
         uint160 slice = 0;
         for (uint160 i = 0; i < 20; i++) {
-            slice += uint160(data[i + start]) * BYTES_160[i];
+            slice += uint160(data[i + start]) * 2 ** (8 * (19 - i));
         }
         return bytes20(slice);
     }
