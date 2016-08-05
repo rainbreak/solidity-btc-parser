@@ -32,3 +32,8 @@ outputs are supported.
 
 There are other functions, but I'd only rely on `checkValueSent` for
 now.
+
+Important note: `checkValueSent` checks if there is *an output* that
+sends *at least* `value` to `btc_address`. If there are multiple
+outputs sending to the same address then they don't get added
+together.
