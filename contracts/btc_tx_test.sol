@@ -2,10 +2,6 @@ import 'dapple/test.sol';
 import 'btc_tx.sol';
 
 contract BasicParseTest is Test {
-    BTCTxParser BTC;
-    function setUp() {
-        BTC = new BTCTxParser();
-    }
     function testGetBytesLittleEndian8() {
         bytes memory data = new bytes(1);
         data[0] = 0xfa;
@@ -110,10 +106,6 @@ contract SolidityTest is Test {
 }
 
 contract BTCTxTest is Test {
-    BTCTxParser BTC;
-    function setUp() {
-        BTC = new BTCTxParser();
-    }
     function testGetFirstTwoOutputs() {
         // transaction data generated with ./generate_bitcoin_transaction.sh
         // txid: 015bb217e9b83dd5d9d1c26e856873ff10325fc77141a153cb1df2a43f3d1033
@@ -233,10 +225,6 @@ contract BTCTxTest is Test {
 // real data from https://blockchain.info/strange-transactions
 // use curl https://blockchain.info/rawtx/TXHASH?format={hex|json} to get the data
 contract StrangeTransactionTest is Test {
-    BTCTxParser BTC;
-    function setUp() {
-        BTC = new BTCTxParser();
-    }
     function testA() {
         // P2SH, OP_RETURN, P2SH
         // hash: 19631dbcca350b703cc7276b13e2866e30df5fd90a05c8cbf5c16772add2ac10

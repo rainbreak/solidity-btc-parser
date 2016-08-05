@@ -16,12 +16,11 @@ upon**. There are probably bugs and the API may change.
 
 ### Usage
 
-Create a parser and verify that the `raw_transaction` has an output
-sending at least `value` to `btc_address`:
+Verify that the `raw_transaction` has an output sending at least
+`value` to `btc_address`:
 
 ```
-parser = new BTCTxParser();
-var success = parser.checkValueSent(raw_transaction, btc_address, value);
+var success = BTC.checkValueSent(raw_transaction, btc_address, value);
 success == true;
 ```
 

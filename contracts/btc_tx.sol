@@ -85,7 +85,7 @@
 // Base58check. These addresses begin with a '3'.
 
 // parse a raw bitcoin transaction byte array
-contract BTCTxParser {
+library BTC {
     // Convert a variable integer into something useful and return it and
     // the index to after it.
     function parseVarInt(bytes txBytes, uint pos) returns (uint, uint) {
