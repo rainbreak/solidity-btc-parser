@@ -47,11 +47,12 @@
 //
 // Public key scripts `pk_script` are set on the output and can
 // take a number of forms. The regular transaction script is
-// called 'pay-to-pubkey-hash':
+// called 'pay-to-pubkey-hash' (P2PKH):
 //
 // OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
 //
-// OP_x are Bitcoin script opcodes. The bytes representation is:
+// OP_x are Bitcoin script opcodes. The bytes representation (including
+// the 0x14 20-byte stack push) is:
 //
 // 0x76 0xA9 0x14 <pubKeyHash> 0x88 0xAC
 //
@@ -64,6 +65,24 @@
 // pubKeyHash, plus a checksum at the end.  The checksum is the first 4 bytes
 // of the (32 byte) double sha256 of the pubKeyHash. (25 bytes total)
 // This is converted to base58 to form the publicly used Bitcoin address.
+// Mainnet P2PKH transaction scripts are to addresses beginning with '1'.
+//
+// P2SH ('pay to script hash') scripts only supply a script hash. The spender
+// must then provide the script that would allow them to redeem this output.
+// This allows for arbitrarily complex scripts to be funded using only a
+// hash of the script, and moves the onus on providing the script from
+// the spender to the redeemer.
+//
+// The P2SH script format is simple:
+//
+// OP_HASH160 <scriptHash> OP_EQUAL
+//
+// 0xA9 0x14 <scriptHash> 0x87
+//
+// The <scriptHash> is the ripemd160 hash of the sha256 hash of the
+// redeem script. The P2SH address is derived from the scriptHash.
+// Addresses are the scriptHash with a version prefix of 5, encoded as
+// Base58check. These addresses begin with a '3'.
 
 // library can't have non constant state variables and constant arrays
 // are not yet supported, so create the precomputed powers array in a contract.
