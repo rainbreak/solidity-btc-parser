@@ -1,7 +1,7 @@
 import 'dapple/test.sol';
 import 'btc_tx.sol';
 
-contract BTCTxTest is Test {
+contract BasicParseTest is Test {
     BTCTxParser BTC;
     function setUp() {
         BTC = new BTCTxParser();
@@ -88,6 +88,9 @@ contract BTCTxTest is Test {
         (val, pos) = BTC.parseVarInt(data, 0);
         assertEq(val, 144396663052566528);
     }
+}
+
+contract SolidityTest is Test {
     // check how solidity deals with partially decoded byte strings.
     // In Python, '\x' characters will be presented decoded if possible.
     function testSolidityBytesEquivalence() {
@@ -103,6 +106,13 @@ contract BTCTxTest is Test {
         assertEq0(data, raw_data);
         assertEq0(data, array_data);
         assertEq0(raw_data, array_data);
+    }
+}
+
+contract BTCTxTest is Test {
+    BTCTxParser BTC;
+    function setUp() {
+        BTC = new BTCTxParser();
     }
     function testGetFirstTwoOutputs() {
         // transaction data generated with ./generate_bitcoin_transaction.sh
