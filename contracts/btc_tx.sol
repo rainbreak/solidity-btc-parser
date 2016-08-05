@@ -305,18 +305,8 @@ contract BTCTxParser is Bytes160 {
         }
         return bytes20(slice);
     }
-    // Get the pubkeyhash from an output script. Assumes standard
-    // pay-to-pubkey-hash (P2PKH) transaction, i.e. NOT P2SH / Multisig.
-    // Returns the pubkeyhash and the end position of the script.
-    function parseOutputScript(bytes txBytes, uint pos, uint script_len)
-             returns (bytes20)
-    {
-        if (isP2PKH(txBytes, pos, script_len)) {
-            return sliceBytes20(txBytes, pos + 3);
-        } else {
-            throw;
-        }
-    }
+    // returns true if the bytes located in txBytes by pos and
+    // script_len represent a P2PKH script
     function isP2PKH(bytes txBytes, uint pos, uint script_len) returns (bool) {
         return (script_len == 25)           // 20 byte pubkeyhash + 5 bytes of script
             && (txBytes[pos] == 0x76)       // OP_DUP
@@ -324,5 +314,27 @@ contract BTCTxParser is Bytes160 {
             && (txBytes[pos + 2] == 0x14)   // bytes to push
             && (txBytes[pos + 23] == 0x88)  // OP_EQUALVERIFY
             && (txBytes[pos + 24] == 0xac); // OP_CHECKSIG
+    }
+    // returns true if the bytes located in txBytes by pos and
+    // script_len represent a P2SH script
+    function isP2SH(bytes txBytes, uint pos, uint script_len) returns (bool) {
+        return (script_len == 23)           // 20 byte scripthash + 3 bytes of script
+            && (txBytes[pos + 0] == 0xa9)   // OP_HASH160
+            && (txBytes[pos + 1] == 0x14)   // bytes to push
+            && (txBytes[pos + 22] == 0x87); // OP_EQUAL
+    }
+    // Get the pubkeyhash / scripthash from an output script. Assumes
+    // pay-to-pubkey-hash (P2PKH) or pay-to-script-hash (P2SH) transactions.
+    // Returns the pubkeyhash/ scripthash.
+    function parseOutputScript(bytes txBytes, uint pos, uint script_len)
+             returns (bytes20)
+    {
+        if (isP2PKH(txBytes, pos, script_len)) {
+            return sliceBytes20(txBytes, pos + 3);
+        } else if (isP2SH(txBytes, pos, script_len)) {
+            return sliceBytes20(txBytes, pos + 2);
+        } else {
+            throw;
+        }
     }
 }
