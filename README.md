@@ -12,3 +12,23 @@ output from [BTC-relay][btcrelay].
 
 This library is still in development and should **not be relied
 upon**. There are probably bugs and the API may change.
+
+
+### Usage
+
+Create a parser and verify that the `raw_transaction` has an output
+sending at least `value` to `btc_address`:
+
+```
+parser = new BTCTxParser();
+var success = parser.checkValueSent(raw_transaction, btc_address, value);
+success == true;
+```
+
+n.b. `btc_address` must be in binary form (not the standard Base58Check).
+
+Both P2PKH (normal addresses beginning '1...') and P2SH ('3...')
+outputs are supported.
+
+There are other functions, but I'd only rely on `checkValueSent` for
+now.
