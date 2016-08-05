@@ -278,6 +278,14 @@ contract BTCTxParser is Bytes160 {
     function assert(bool assertion) internal {
         if (!assertion) throw;
     }
+    // Slice 20 contiguous bytes from bytes `data`, starting at `start`
+    function sliceBytes20(bytes data, uint start) returns (bytes20) {
+        uint160 slice = 0;
+        for (uint160 i = 0; i < 20; i++) {
+            slice += uint160(data[i + start]) * BYTES_160[i];
+        }
+        return bytes20(slice);
+    }
     // Get the pubkeyhash from an output script. Assumes standard
     // pay-to-pubkey-hash (P2PKH) transaction, i.e. NOT P2SH / Multisig.
     // Returns the pubkeyhash and the end position of the script.
@@ -291,10 +299,6 @@ contract BTCTxParser is Bytes160 {
         assert(txBytes[pos + 23] == 0x88);  // OP_EQUALVERIFY
         assert(txBytes[pos + 24] == 0xac);  // OP_CHECKSIG
 
-        uint160 pubkeyhash = 0;
-        for (uint160 i = 0; i < 20; i++) {
-            pubkeyhash += uint160(txBytes[i + pos + 3]) * BYTES_160[i];
-        }
-        return bytes20(pubkeyhash);
+        return sliceBytes20(txBytes, pos + 3);
     }
 }
