@@ -324,8 +324,8 @@ contract BTCTxParser is Bytes160 {
             && (txBytes[pos + 22] == 0x87); // OP_EQUAL
     }
     // Get the pubkeyhash / scripthash from an output script. Assumes
-    // pay-to-pubkey-hash (P2PKH) or pay-to-script-hash (P2SH) transactions.
-    // Returns the pubkeyhash/ scripthash.
+    // pay-to-pubkey-hash (P2PKH) or pay-to-script-hash (P2SH) outputs.
+    // Returns the pubkeyhash/ scripthash, or zero if unknown output.
     function parseOutputScript(bytes txBytes, uint pos, uint script_len)
              returns (bytes20)
     {
@@ -334,7 +334,7 @@ contract BTCTxParser is Bytes160 {
         } else if (isP2SH(txBytes, pos, script_len)) {
             return sliceBytes20(txBytes, pos + 2);
         } else {
-            throw;
+            return;
         }
     }
 }
