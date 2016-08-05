@@ -134,6 +134,7 @@ contract BTCTxTest is Test {
 
         assertTrue(BTC.isP2PKH(pk_script, 0, 25));
         assertFalse(BTC.isP2PKH(pk_script, 0, 24));
+        assertFalse(BTC.isP2PKH(pk_script, 0, 26));
 
         pk_script = "\x77\xa9\x14\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73\x88\xac";
         assertFalse(BTC.isP2PKH(pk_script, 0, 25));
@@ -156,6 +157,7 @@ contract BTCTxTest is Test {
 
         assertTrue(BTC.isP2SH(script, 0, 23));
         assertFalse(BTC.isP2SH(script, 0, 22));
+        assertFalse(BTC.isP2SH(script, 0, 24));
 
         script = "\xa9\x15\x1a\x8b\x00\x26\x34\x31\x66\x62\x5c\x74\x75\xf0\x1e\x48\xb5\xed\xe8\xc0\x25\x2e\x87";
         assertFalse(BTC.isP2SH(script, 0, 23));
