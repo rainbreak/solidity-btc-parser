@@ -129,6 +129,19 @@ contract BTCTxTest is Test {
         assertEq20(oa1, ea1);
         assertEq20(oa2, ea2);
     }
+    function testIdP2pkh() {
+        bytes memory pk_script = "\x76\xa9\x14\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73\x88\xac";
+
+        assertTrue(BTC.isP2PKH(pk_script, 0, 25));
+        assertFalse(BTC.isP2PKH(pk_script, 0, 24));
+
+        pk_script = "\x77\xa9\x14\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73\x88\xac";
+        assertFalse(BTC.isP2PKH(pk_script, 0, 25));
+    }
+    function testFailIdShortP2pkh() {
+        bytes memory pk_script = "\x76\xa9\x14";
+        BTC.isP2PKH(pk_script, 0, 25);
+    }
     function testParseOutputScript() logs_gas() {
         bytes memory pk_script = "\x76\xa9\x14\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73\x88\xac";
         bytes20 rpkhash = bytes20("\xe1\xb6\x7c\x3a\x7f\x89\x77\xfa\xc5\x5a\x15\xdb\xdb\x19\xc7\xa1\x75\x67\x6d\x73");

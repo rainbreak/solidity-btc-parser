@@ -311,13 +311,18 @@ contract BTCTxParser is Bytes160 {
     function parseOutputScript(bytes txBytes, uint pos, uint script_len)
              returns (bytes20)
     {
-        assert(txBytes[pos] == 0x76);       // OP_DUP
-        assert(txBytes[pos + 1] == 0xa9);   // OP_HASH160
-        assert(txBytes[pos + 2] == 0x14);   // bytes to push
-        assert(script_len == 25);           // 20 byte pubkeyhash + 5 bytes of script
-        assert(txBytes[pos + 23] == 0x88);  // OP_EQUALVERIFY
-        assert(txBytes[pos + 24] == 0xac);  // OP_CHECKSIG
-
-        return sliceBytes20(txBytes, pos + 3);
+        if (isP2PKH(txBytes, pos, script_len)) {
+            return sliceBytes20(txBytes, pos + 3);
+        } else {
+            throw;
+        }
+    }
+    function isP2PKH(bytes txBytes, uint pos, uint script_len) returns (bool) {
+        return (script_len == 25)           // 20 byte pubkeyhash + 5 bytes of script
+            && (txBytes[pos] == 0x76)       // OP_DUP
+            && (txBytes[pos + 1] == 0xa9)   // OP_HASH160
+            && (txBytes[pos + 2] == 0x14)   // bytes to push
+            && (txBytes[pos + 23] == 0x88)  // OP_EQUALVERIFY
+            && (txBytes[pos + 24] == 0xac); // OP_CHECKSIG
     }
 }
