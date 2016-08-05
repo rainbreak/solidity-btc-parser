@@ -86,13 +86,6 @@
 
 // parse a raw bitcoin transaction byte array
 contract BTCTxParser {
-    uint constant BYTES_1 = 2 ** 8;
-    uint constant BYTES_2 = 2 ** 16;
-    uint constant BYTES_3 = 2 ** 24;
-    uint constant BYTES_4 = 2 ** 32;
-    uint constant BYTES_5 = 2 ** 40;
-    uint constant BYTES_6 = 2 ** 48;
-    uint constant BYTES_7 = 2 ** 56;
     // Convert a variable integer into something useful and return it and
     // the index to after it.
     function parseVarInt(bytes txBytes, uint pos) returns (uint, uint) {
@@ -116,21 +109,21 @@ contract BTCTxParser {
             return uint8(data[pos]);
         } else if (bits == 16) {
             return uint16(data[pos])
-                 + uint16(data[pos + 1]) * BYTES_1;
+                 + uint16(data[pos + 1]) * 2 ** 8;
         } else if (bits == 32) {
             return uint32(data[pos])
-                 + uint32(data[pos + 1]) * BYTES_1
-                 + uint32(data[pos + 2]) * BYTES_2
-                 + uint32(data[pos + 3]) * BYTES_3;
+                 + uint32(data[pos + 1]) * 2 ** 8
+                 + uint32(data[pos + 2]) * 2 ** 16
+                 + uint32(data[pos + 3]) * 2 ** 24;
         } else if (bits == 64) {
             return uint64(data[pos])
-                 + uint64(data[pos + 1]) * BYTES_1
-                 + uint64(data[pos + 2]) * BYTES_2
-                 + uint64(data[pos + 3]) * BYTES_3
-                 + uint64(data[pos + 4]) * BYTES_4
-                 + uint64(data[pos + 5]) * BYTES_5
-                 + uint64(data[pos + 6]) * BYTES_6
-                 + uint64(data[pos + 7]) * BYTES_7;
+                 + uint64(data[pos + 1]) * 2 ** 8
+                 + uint64(data[pos + 2]) * 2 ** 16
+                 + uint64(data[pos + 3]) * 2 ** 24
+                 + uint64(data[pos + 4]) * 2 ** 32
+                 + uint64(data[pos + 5]) * 2 ** 40
+                 + uint64(data[pos + 6]) * 2 ** 48
+                 + uint64(data[pos + 7]) * 2 ** 56;
         }
     }
     // scan the full transaction bytes and return the first two output
