@@ -47,11 +47,12 @@
 //
 // Public key scripts `pk_script` are set on the output and can
 // take a number of forms. The regular transaction script is
-// called 'pay-to-pubkey-hash':
+// called 'pay-to-pubkey-hash' (P2PKH):
 //
 // OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
 //
-// OP_x are Bitcoin script opcodes. The bytes representation is:
+// OP_x are Bitcoin script opcodes. The bytes representation (including
+// the 0x14 20-byte stack push) is:
 //
 // 0x76 0xA9 0x14 <pubKeyHash> 0x88 0xAC
 //
@@ -64,6 +65,24 @@
 // pubKeyHash, plus a checksum at the end.  The checksum is the first 4 bytes
 // of the (32 byte) double sha256 of the pubKeyHash. (25 bytes total)
 // This is converted to base58 to form the publicly used Bitcoin address.
+// Mainnet P2PKH transaction scripts are to addresses beginning with '1'.
+//
+// P2SH ('pay to script hash') scripts only supply a script hash. The spender
+// must then provide the script that would allow them to redeem this output.
+// This allows for arbitrarily complex scripts to be funded using only a
+// hash of the script, and moves the onus on providing the script from
+// the spender to the redeemer.
+//
+// The P2SH script format is simple:
+//
+// OP_HASH160 <scriptHash> OP_EQUAL
+//
+// 0xA9 0x14 <scriptHash> 0x87
+//
+// The <scriptHash> is the ripemd160 hash of the sha256 hash of the
+// redeem script. The P2SH address is derived from the scriptHash.
+// Addresses are the scriptHash with a version prefix of 5, encoded as
+// Base58check. These addresses begin with a '3'.
 
 // library can't have non constant state variables and constant arrays
 // are not yet supported, so create the precomputed powers array in a contract.
@@ -278,23 +297,44 @@ contract BTCTxParser is Bytes160 {
     function assert(bool assertion) internal {
         if (!assertion) throw;
     }
-    // Get the pubkeyhash from an output script. Assumes standard
-    // pay-to-pubkey-hash (P2PKH) transaction, i.e. NOT P2SH / Multisig.
-    // Returns the pubkeyhash and the end position of the script.
+    // Slice 20 contiguous bytes from bytes `data`, starting at `start`
+    function sliceBytes20(bytes data, uint start) returns (bytes20) {
+        uint160 slice = 0;
+        for (uint160 i = 0; i < 20; i++) {
+            slice += uint160(data[i + start]) * BYTES_160[i];
+        }
+        return bytes20(slice);
+    }
+    // returns true if the bytes located in txBytes by pos and
+    // script_len represent a P2PKH script
+    function isP2PKH(bytes txBytes, uint pos, uint script_len) returns (bool) {
+        return (script_len == 25)           // 20 byte pubkeyhash + 5 bytes of script
+            && (txBytes[pos] == 0x76)       // OP_DUP
+            && (txBytes[pos + 1] == 0xa9)   // OP_HASH160
+            && (txBytes[pos + 2] == 0x14)   // bytes to push
+            && (txBytes[pos + 23] == 0x88)  // OP_EQUALVERIFY
+            && (txBytes[pos + 24] == 0xac); // OP_CHECKSIG
+    }
+    // returns true if the bytes located in txBytes by pos and
+    // script_len represent a P2SH script
+    function isP2SH(bytes txBytes, uint pos, uint script_len) returns (bool) {
+        return (script_len == 23)           // 20 byte scripthash + 3 bytes of script
+            && (txBytes[pos + 0] == 0xa9)   // OP_HASH160
+            && (txBytes[pos + 1] == 0x14)   // bytes to push
+            && (txBytes[pos + 22] == 0x87); // OP_EQUAL
+    }
+    // Get the pubkeyhash / scripthash from an output script. Assumes
+    // pay-to-pubkey-hash (P2PKH) or pay-to-script-hash (P2SH) outputs.
+    // Returns the pubkeyhash/ scripthash, or zero if unknown output.
     function parseOutputScript(bytes txBytes, uint pos, uint script_len)
              returns (bytes20)
     {
-        assert(txBytes[pos] == 0x76);       // OP_DUP
-        assert(txBytes[pos + 1] == 0xa9);   // OP_HASH160
-        assert(txBytes[pos + 2] == 0x14);   // bytes to push
-        assert(script_len == 25);           // 20 byte pubkeyhash + 5 bytes of script
-        assert(txBytes[pos + 23] == 0x88);  // OP_EQUALVERIFY
-        assert(txBytes[pos + 24] == 0xac);  // OP_CHECKSIG
-
-        uint160 pubkeyhash = 0;
-        for (uint160 i = 0; i < 20; i++) {
-            pubkeyhash += uint160(txBytes[i + pos + 3]) * BYTES_160[i];
+        if (isP2PKH(txBytes, pos, script_len)) {
+            return sliceBytes20(txBytes, pos + 3);
+        } else if (isP2SH(txBytes, pos, script_len)) {
+            return sliceBytes20(txBytes, pos + 2);
+        } else {
+            return;
         }
-        return bytes20(pubkeyhash);
     }
 }
