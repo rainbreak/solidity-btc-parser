@@ -254,9 +254,6 @@ library BTC {
 
         return (output_values, script_starts, script_lens, pos);
     }
-    function assert(bool assertion) internal {
-        if (!assertion) throw;
-    }
     // Slice 20 contiguous bytes from bytes `data`, starting at `start`
     function sliceBytes20(bytes data, uint start) returns (bytes20) {
         uint160 slice = 0;
