@@ -1,5 +1,6 @@
-import 'ds-test/test.sol';
+pragma solidity ^0.4.11;
 
+import 'ds-test/test.sol';
 import './btc_tx.sol';
 
 contract BasicParseTest is DSTest {

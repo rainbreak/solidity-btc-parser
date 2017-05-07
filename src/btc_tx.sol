@@ -98,6 +98,8 @@
 // Addresses are the scriptHash with a version prefix of 5, encoded as
 // Base58check. These addresses begin with a '3'.
 
+pragma solidity ^0.4.11;
+
 // parse a raw bitcoin transaction byte array
 library BTC {
     // Convert a variable integer into something useful and return it and
