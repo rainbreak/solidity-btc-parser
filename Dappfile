@@ -1,0 +1,4 @@
+name           btc-tx
+description    Library for parsing raw Bitcoin transactions
+version        0.1.0
+author         Rain <rainbreak@risup.net>
