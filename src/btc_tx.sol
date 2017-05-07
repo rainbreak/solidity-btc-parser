@@ -261,7 +261,7 @@ library BTC {
     function sliceBytes20(bytes data, uint start) returns (bytes20) {
         uint160 slice = 0;
         for (uint160 i = 0; i < 20; i++) {
-            slice += uint160(data[i + start]) * 2 ** (8 * (19 - i));
+            slice += uint160(data[i + start]) << (8 * (19 - i));
         }
         return bytes20(slice);
     }
